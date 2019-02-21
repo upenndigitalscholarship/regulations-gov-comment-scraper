@@ -31,7 +31,7 @@ Once you have Python and the `requests` library installed, and have received an 
    ```
    
    The docket ID appears on the page for the set of comments you've selected:
-   [!A screenshot of the docket ID](https://user-images.githubusercontent.com/4257267/53193703-a7c20400-35df-11e9-9089-35157cd065bb.png)
+   ![A screenshot of the docket ID](https://user-images.githubusercontent.com/4257267/53193703-a7c20400-35df-11e9-9089-35157cd065bb.png)
   
 3) Total number of documents:
 
@@ -45,4 +45,4 @@ Once you have Python and the `requests` library installed, and have received an 
    ```
     
    The number of documents also appears on the page above:
-   [!A screenshot of the number of documents](https://user-images.githubusercontent.com/4257267/53193710-abee2180-35df-11e9-8fe0-a0cd4e87d0f9.png)
+   ![A screenshot of the number of documents](https://user-images.githubusercontent.com/4257267/53193710-abee2180-35df-11e9-8fe0-a0cd4e87d0f9.png)
