@@ -1,42 +1,65 @@
-import os
 import requests
-import json
+import csv
 import time
-from docx import Document
-import urllib
+import sys
 
-header = "https://api.data.gov/regulations/v3/document.json?api_key=sILE0BdGLfTiMoa0JG7mssuvpPHC06bNK72u9As6&documentId="
-apiKey = #add api key here"
+api_key = '' # insert your api key between quotes
+docket_id = '' # insert the docket id between quotes (e.g. VA-2016-VHA-0011)
+total_docs = 217568  # total number of documents, as indicated by the page for the given docket id
+docs_per_page = 1000  # maximum number of results per page; no reason to change
 
+url = ('https://api.data.gov:443/regulations/v3/'
+       'documents.json?api_key={}&dktid={}&rpp={}&po={}')
 
-documentIDs = [#add document ids here]
+def make_urls():
+    return [url.format(api_key, docket_id, docs_per_page, i)
+            for i in range(0, total_docs, docs_per_page)]
 
-os.chdir(#add target directory here)
+def get(url):
+    r = requests.get(url)
+    if r.status_code == 200:
+        return r.json().get('documents', {})
+    else:
+        return {}
 
-for document in documentIDs:
-    thisDocument = header + document
-    comment = json.loads(requests.get(thisDocument).text)
-    submitterName = comment['submitterName']['value']
-    organization = comment['organization']['value']
-    fullComment = comment['comment']['value']
-    attachments = comment['attachments']
+def save_batch(batch, ix):
+    keys = set(k for d in batch for k in d.keys())
+    with open('batch_{:03d}.csv'.format(ix), 'w', encoding='utf-8') as op:
+        wr = csv.DictWriter(op, fieldnames=sorted(keys))
+        wr.writeheader()
+        wr.writerows(batch)
 
-    i = 1
-    for a in attachments:
-        sat = a['fileFormats'][0]
-        strarray = str(sat).split('?', 2)
-        attachurl = str(strarray[0]) + '?' + apiKey + '&' + strarray[1]
-        attachf = document + "_(" + str(i) + ")_" + "Attachment.docx"
-        urllib.request.urlretrieve(attachurl, attachf)
-        i = i + 1
+def fetch_urls(urls):
+    data = {}
+    errors = []
+    urls = make_urls()
+    for i, url in enumerate(urls):
+        d = get(url)
+        if d:
+            data[url] = d
+            save_batch(d, i)
+        else:
+            errors.append(url)
+            print('error on url {}'.format(url))
+        time.sleep(5)
 
-    commentDoc = Document();
+    with open('error-urls.txt', 'w', encoding='utf-8') as op:
+        for e in errors:
+            op.write(e)
+            op.write('\n')
 
-    commentDoc.add_paragraph(submitterName)
-    commentDoc.add_paragraph(organization)
-    commentDoc.add_paragraph(fullComment)
+def fix_errors(err_file):
+    with open(err_file, encoding='utf-8') as ip:
+        urls = ip.readlines()
+    fetch_urls(urls)
 
-    commentDoc.save(document + '.docx')
-    print("reached document " + document)
+def main():
+    urls = make_urls()
+    fetch_urls(urls)
 
-    time.sleep(3)
+if __name__ == '__main__':
+    if len(sys.argv) > 1:
+        errf = sys.argv[1]
+        fix_errors(errf)
+    else:
+        main()
