@@ -27,7 +27,7 @@ Once you have Python and the `requests` library installed, and have received an 
    ```
    paste the docket ID between the single quotation marks:
    ```
-   docket_id = '(THE DOCKET ID THAT YOU COPIED)' 
+   docket_id = 'ED-2018-OCR-0064' 
    ```
    
    The docket ID appears on the page for the set of comments you're scraping:
