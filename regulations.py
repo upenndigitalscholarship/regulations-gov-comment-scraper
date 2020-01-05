@@ -7,6 +7,7 @@ api_key = '' # insert your api key between quotes
 docket_id = '' # insert the docket id between quotes (e.g. VA-2016-VHA-0011)
 total_docs = 217568  # total number of documents, as indicated by the page for the given docket id
 docs_per_page = 1000  # maximum number of results per page; no reason to change
+err_file = None  # a file containing the urls with reported errors; leave this as None most of the time
 
 url = ('https://api.data.gov:443/regulations/v3/'
        'documents.json?api_key={}&dktid={}&rpp={}&po={}')
@@ -58,8 +59,7 @@ def main():
     fetch_urls(urls)
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        errf = sys.argv[1]
-        fix_errors(errf)
+    if err_file is not None:
+        fix_errors(err_file)
     else:
         main()
